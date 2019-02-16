@@ -11,7 +11,7 @@ from dbeurive.ispdb.pop3 import Pop3
 from dbeurive.ispdb.smtp import Smtp
 from typing import Union
 
-class Domain:
+class Isp:
 
     def __init__(self, in_xml: str):
 
@@ -250,4 +250,4 @@ if '__main__' == __name__:
     </clientConfig>
     '''
 
-    domain = Domain(xml)
+    domain = Isp(xml)
