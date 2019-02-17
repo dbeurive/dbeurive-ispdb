@@ -1,28 +1,38 @@
 # This is for quick testing
+
 if '__main__' == __name__:
     import os
     import sys
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), os.path.pardir, os.path.pardir))
 
 import urllib.request
-from typing import Union, Dict, Any
+import cgi
+from typing import Union, Dict, List
 from pprint import pprint
 from http.client import HTTPResponse
 from http.client import HTTPMessage
-import cgi
 from collections import Mapping
-import html.parser
+from dbeurive.ispdb.web.parser import Parser
+from dbeurive.ispdb.web.isp import Isp as IspRef
+
+
 
 class Ispdb:
-    ISPDB_URL='https://autoconfig.thunderbird.net/v1.1'
+    ISPDB_URL='https://autoconfig.thunderbird.net/v1.1/'
 
-    def get_isp_list(self) -> str:
+    def get_isp_list(self) -> List[IspRef]:
         response: HTTPResponse = urllib.request.urlopen(self.ISPDB_URL)
         charset = self._get_charset(response)
-        return response.read().decode(charset)
+        html  = response.read().decode(charset)
+        parser = Parser()
+        parser.feed(html)
+        isps = parser.get_isps()
+        return isps
 
     def get_isp(self, isp_name: str):
-        urllib.request.urlopen(f'{self.ISPDB_URL}/{isp_name}')
+        response: HTTPResponse = urllib.request.urlopen(f'{self.ISPDB_URL}/{isp_name}')
+        charset = self._get_charset(response)
+        xml = response.read().decode(charset)
         pass
 
     @staticmethod
@@ -31,7 +41,7 @@ class Ispdb:
         content_type = h.get('Content-Type')
         params = cgi.parse_header(content_type)
         # noinspection PyUnusedLocal
-        param: Union[Dict[Any, Any], Any]
+        param: Union[Dict[str, str], str]
         for param in params:
             if isinstance(param, Mapping):
                 if 'charset' in param:
