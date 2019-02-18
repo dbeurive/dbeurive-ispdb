@@ -7,7 +7,7 @@ if '__main__' == __name__:
 
 import urllib.request
 import cgi
-from typing import Union, Dict, List
+from typing import Union, Dict, List, Tuple
 from pprint import pprint
 from http.client import HTTPResponse
 from http.client import HTTPMessage
@@ -20,23 +20,39 @@ from dbeurive.ispdb.web.isp import Isp as IspRef
 class Ispdb:
     ISPDB_URL='https://autoconfig.thunderbird.net/v1.1/'
 
-    def get_isp_list(self) -> List[IspRef]:
+    def get_isp_list(self) -> Tuple[str, List[IspRef]]:
         response: HTTPResponse = urllib.request.urlopen(self.ISPDB_URL)
-        charset = self._get_charset(response)
-        html  = response.read().decode(charset)
+        charset, found = self._get_charset(response)
+        html_response = response.read().decode(charset)
         parser = Parser()
-        parser.feed(html)
-        isps = parser.get_isps()
-        return isps
+        parser.feed(html_response)
+        isps_list = parser.get_isps()
+        return html_response, isps_list
 
-    def get_isp(self, isp_name: str):
+    def get_isp_raw_data(self, isp_name: str) -> str:
         response: HTTPResponse = urllib.request.urlopen(f'{self.ISPDB_URL}/{isp_name}')
-        charset = self._get_charset(response)
-        xml = response.read().decode(charset)
-        pass
+        charset, found = self._get_charset(response)
+        assert charset is not None
+        xml_desc = response.read().decode(charset)
+        return xml_desc
+
+    def get_isps_raw_data(self) -> List[str]:
+        ispdb_requester = Ispdb()
+        html_response, isps_list = ispdb_requester.get_isp_list()
+        list_result = []
+        for isp in isps_list:
+            xml_desc = self.get_isp_raw_data(isp.name)
+            list_result.append(xml_desc)
+        return list_result
+
+
+
+
+
+
 
     @staticmethod
-    def _get_charset(response: HTTPResponse) -> Union[str, None]:
+    def _get_charset(response: HTTPResponse) -> Tuple[str, bool]:
         h: HTTPMessage = response.info()
         content_type = h.get('Content-Type')
         params = cgi.parse_header(content_type)
@@ -45,8 +61,9 @@ class Ispdb:
         for param in params:
             if isinstance(param, Mapping):
                 if 'charset' in param:
-                    return param['charset']
-        return None
+                    return param['charset'], True
+        # @see https://www.w3.org/International/articles/http-charset/index
+        return 'ISO-8859-1', False
 
 
 # -----------------------------------------------------------------
@@ -56,7 +73,8 @@ class Ispdb:
 if '__main__' == __name__:
 
     requester = Ispdb()
-    r = requester.get_isp_list()
+    html, isps = requester.get_isp_list()
 
-    pprint(r)
+    xml = requester.get_isp_raw_data('gmail.com')
+    print(xml)
 

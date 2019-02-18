@@ -1,0 +1,20 @@
+<clientConfig version="1.1">
+  <emailProvider id="kokuyou.ne.jp">
+    <domain>kokuyou.ne.jp</domain>
+    <displayName>é·åçºé»èã®éããã­ã£ã¨</displayName>
+    <displayShortName>ããã­ã£ã¨</displayShortName>
+    <incomingServer type="pop3">
+      <hostname>mail.kokuyou.ne.jp</hostname>
+      <port>110</port>
+      <socketType>plain</socketType>
+      <username>%EMAILLOCALPART%</username>
+      <authentication>password-cleartext</authentication>
+    </incomingServer>
+    <outgoingServer type="smtp">
+      <hostname>smtp.kokuyou.ne.jp</hostname>
+      <port>25</port>
+      <socketType>plain</socketType>
+      <authentication>none</authentication>
+    </outgoingServer>
+  </emailProvider>
+</clientConfig>

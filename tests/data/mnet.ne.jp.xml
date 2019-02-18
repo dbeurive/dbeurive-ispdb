@@ -1,0 +1,21 @@
+<clientConfig version="1.1">
+  <emailProvider id="mnet.ne.jp">
+    <domain>mnet.ne.jp</domain>
+    <displayName>Mnet ã¡ã¼ã« ãµã¼ãã¹</displayName>
+    <displayShortName>Mnetã¡ã¼ã«</displayShortName>
+    <incomingServer type="pop3">
+      <hostname>mail.mnet.ne.jp</hostname>
+      <port>110</port>
+      <socketType>plain</socketType>
+      <username>%EMAILADDRESS%</username>
+      <authentication>password-encrypted</authentication>
+    </incomingServer>
+    <outgoingServer type="smtp">
+      <hostname>mail.mnet.ne.jp</hostname>
+      <port>587</port>
+      <socketType>plain</socketType>
+      <username>%EMAILADDRESS%</username>
+      <authentication>password-encrypted</authentication>
+    </outgoingServer>
+  </emailProvider>
+</clientConfig>
