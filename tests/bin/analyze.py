@@ -4,9 +4,11 @@ import sys
 import re
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), os.path.pardir, os.path.pardir))
 
-from typing import Mapping, List
+from typing import Mapping, List, Union
 from dbeurive.ispdb.isp import Isp
-import string
+from dbeurive.ispdb.smtp import Smtp
+from dbeurive.ispdb.pop3 import Pop3
+from dbeurive.ispdb.imap import Imap
 
 
 KEY_SMTP = 'smtp'
@@ -23,6 +25,9 @@ data_by_name: Mapping[str, Mapping[str, int]] = {KEY_IMAP: {}, KEY_POP3: {}, KEY
 data_by_count: Mapping[str, Mapping[int, List[str]]] = {KEY_IMAP: {}, KEY_POP3: {}, KEY_SMTP: {}}
 valid: List[str] = []
 invalid: List[str] = []
+auth_smtp: List[str] = []
+auth_imap: List[str] = []
+auth_pop3: List[str] = []
 
 for xml_file in xml_files:
     xml_path = os.path.join(data_dir_path, xml_file)
@@ -55,6 +60,25 @@ for xml_file in xml_files:
     data_by_count[KEY_SMTP][isp.get_smtp_configs_count()].append(xml_file)
     data_by_count[KEY_POP3][isp.get_pop3_configs_count()].append(xml_file)
 
+    config: Union[None, List[Imap]] = isp.get_imap_configs()
+    if config is not None:
+        for conf in isp.get_imap_configs():
+            if len(conf.authentications) > 1:
+                auth_imap.append(xml_file)
+
+    config: Union[None, List[Smtp]] = isp.get_smtp_configs()
+    if config is not None:
+        for conf in isp.get_smtp_configs():
+            if len(conf.authentications) > 1:
+                auth_smtp.append(xml_file)
+
+    config: Union[None, List[Pop3]] = isp.get_pop3_configs()
+    if config is not None:
+        for conf in isp.get_pop3_configs():
+            if len(conf.authentications) > 1:
+                auth_pop3.append(xml_file)
+
+
 # Print lists of files for a given protocol and a given configuration count.
 
 for protocol, counts in data_by_count.items():
@@ -62,18 +86,17 @@ for protocol, counts in data_by_count.items():
     count: Mapping[int, List[str]]
     for count, files in counts.items():
         print(f"\t{count}: {', '.join(files[0:3])}")
-    print(f"END({protocol})\n")
+    print("")
 
-# Print list of valid and invalid files.
+# Print lists of valid and invalid files.
 
 print(f'VALID: {", ".join(valid[0:3])}')
 print(f'INVALID: {", ".join(invalid[0:3])}')
+print("")
 
+# Print lists of configurations that have more than one authentication method.
 
-
-
-
-
-
-
-
+print(f'SMTP: {", ".join(auth_imap[0:3])}')
+print(f'POP3: {", ".join(auth_pop3[0:3])}')
+print(f'IMAP: {", ".join(auth_imap[0:3])}')
+print("")

@@ -104,7 +104,7 @@ class Isp:
         self._provider.id = configuration.getAttribute('id')
 
         domains: minidom.NodeList = configuration.getElementsByTagName('domain')
-        self._provider.domains = map(lambda x: self._get_text_from_single_text_element(x), domains)
+        self._provider.domains = list(map(lambda x: self._get_text_from_single_text_element(x), domains))
 
         # The XML file for some ISP is not valid.
         display_name: minidom.NodeList = configuration.getElementsByTagName('displayName')
@@ -141,7 +141,7 @@ class Isp:
             imap.username = self._get_text_from_single_text_element(username[0])
 
             authentications = configuration.getElementsByTagName('authentication')
-            imap.authentications = map(lambda x: self._get_text_from_single_text_element(x), authentications)
+            imap.authentications = list(map(lambda x: self._get_text_from_single_text_element(x), authentications))
 
             self._imap.append(imap)
 
@@ -167,7 +167,7 @@ class Isp:
             pop3.username = self._get_text_from_single_text_element(username[0])
 
             authentications = configuration.getElementsByTagName('authentication')
-            pop3.authentications = map(lambda x: self._get_text_from_single_text_element(x), authentications)
+            pop3.authentications = list(map(lambda x: self._get_text_from_single_text_element(x), authentications))
 
             self._pop3.append(pop3)
 
@@ -195,7 +195,7 @@ class Isp:
 
             authentications = configuration.getElementsByTagName('authentication')
             assert len(authentications) > 0
-            smtp.authentications = map(lambda x: self._get_text_from_single_text_element(x), authentications)
+            smtp.authentications = list(map(lambda x: self._get_text_from_single_text_element(x), authentications))
 
             self._smtp.append(smtp)
 

@@ -14,7 +14,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), os.p
 
 import time
 from dbeurive.ispdb.ispdb import Ispdb
-
+from dbeurive.ispdb.web.webisp import WebIsp
+from typing import List
 
 data_dir_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.path.pardir, 'data')
 list_html_path = os.path.join(data_dir_path, 'ispdb.html')
@@ -23,6 +24,9 @@ print(f"Path to the data directory: {data_dir_path}")
 print(f"HTML document: {list_html_path}")
 
 ispdb = Ispdb()
+# noinspection PyUnusedLocal
+html: str; isp: List[WebIsp]
+# noinspection PyRedeclaration
 html, isps = ispdb.get_isp_list()
 
 # -----------------------------------------------------------------------------
@@ -40,6 +44,7 @@ except EnvironmentError as e:
 # Get all the ISPs XML files.
 # -----------------------------------------------------------------------------
 
+isp: WebIsp
 for isp in isps:
     xml_path = os.path.join(data_dir_path, f'{isp.name}.xml')
     print(f'Get data for "{isp.name}" -> {xml_path}')

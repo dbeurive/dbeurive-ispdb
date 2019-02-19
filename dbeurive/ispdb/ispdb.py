@@ -1,26 +1,28 @@
 # This is for quick testing
 
+import sys
+
 if '__main__' == __name__:
     import os
-    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), os.path.pardir, os.path.pardir))
+
+assert sys.version_info >= (3, 6)
 
 import urllib.request
 import cgi
 from typing import Union, Dict, List, Tuple
-from pprint import pprint
 from http.client import HTTPResponse
 from http.client import HTTPMessage
 from collections import Mapping
 from dbeurive.ispdb.web.parser import Parser
-from dbeurive.ispdb.web.isp import Isp as IspRef
+from dbeurive.ispdb.web.webisp import WebIsp
 
 
 
 class Ispdb:
     ISPDB_URL='https://autoconfig.thunderbird.net/v1.1/'
 
-    def get_isp_list(self) -> Tuple[str, List[IspRef]]:
+    def get_isp_list(self) -> Tuple[str, List[WebIsp]]:
         response: HTTPResponse = urllib.request.urlopen(self.ISPDB_URL)
         charset, found = self._get_charset(response)
         html_response = response.read().decode(charset)
@@ -40,16 +42,12 @@ class Ispdb:
         ispdb_requester = Ispdb()
         html_response, isps_list = ispdb_requester.get_isp_list()
         list_result = []
+        # noinspection PyUnusedLocal
+        isp: WebIsp
         for isp in isps_list:
             xml_desc = self.get_isp_raw_data(isp.name)
             list_result.append(xml_desc)
         return list_result
-
-
-
-
-
-
 
     @staticmethod
     def _get_charset(response: HTTPResponse) -> Tuple[str, bool]:

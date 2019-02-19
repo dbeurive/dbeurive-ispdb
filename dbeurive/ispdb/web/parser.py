@@ -6,7 +6,7 @@ if '__main__' == __name__:
 
 from typing import Union, List
 from html.parser import HTMLParser
-from dbeurive.ispdb.web.isp import Isp
+from dbeurive.ispdb.web.webisp import WebIsp
 
 
 
@@ -204,7 +204,7 @@ class Parser(HTMLParser):
             return
 
         if __class__.STATE_CLOSE_TD_EMPTY == self._current_state and 'tr' == tag:
-            self._isps.append(Isp(
+            self._isps.append(WebIsp(
                 self._buffer[__class__.KEY_NAME],
                 self._buffer[__class__.KEY_SIZE],
                 self._buffer[__class__.KEY_DATE])
@@ -226,7 +226,8 @@ class Parser(HTMLParser):
             return
 
         if __class__.STATE_OPEN_TD_SIZE == self._current_state:
-            self._buffer[__class__.KEY_SIZE] = data
+            data: str
+            self._buffer[__class__.KEY_SIZE] = data.strip()
             self._current_state = __class__.STATE_SIZE
             return
 
